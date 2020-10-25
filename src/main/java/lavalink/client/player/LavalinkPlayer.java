@@ -221,7 +221,7 @@ public class LavalinkPlayer implements IPlayer {
         json.put("op", "equalizer");
         json.put("guildId", link.getGuildId());
         json.put("bands", jsonArray);
-        System.out.println(jsonArray.toString());
+
         node.send(json.toString());
     }
 
