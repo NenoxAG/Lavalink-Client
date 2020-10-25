@@ -31,6 +31,7 @@ import lavalink.client.player.event.PlayerEvent;
 import lavalink.client.player.event.PlayerPauseEvent;
 import lavalink.client.player.event.PlayerResumeEvent;
 import lavalink.client.player.event.TrackStartEvent;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class LavalinkPlayer implements IPlayer {
     private AudioTrack track = null;
     private boolean paused = false;
     private int volume = 100;
+    private double[] eq = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private long updateTime = -1;
     private long position = -1;
 
@@ -192,6 +194,37 @@ public class LavalinkPlayer implements IPlayer {
     public void provideState(JSONObject json) {
         updateTime = json.getLong("time");
         position = json.optLong("position", 0);
+    }
+
+    public void setEq(double[] eq) {
+        JSONArray jsonArray = new JSONArray();
+        double[] eqMinMax = new double[15];
+        for(int i = 0; i < eq.length; i++) {
+            double gain = Math.min(1, Math.max(-0.25, eq[i])); // Lavaplayer bounds
+
+            eqMinMax[i] = gain;
+
+            JSONObject obj = new JSONObject();
+            obj.put("band", i);
+            obj.put("gain", gain);
+            jsonArray.put(obj);
+        }
+
+        this.eq = eqMinMax;
+
+        LavalinkSocket node = link.getNode(false);
+        if(node == null) return;
+
+        JSONObject json = new JSONObject();
+        json.put("op", "equalizer");
+        json.put("guildId", link.getGuildId());
+        json.put("bands", jsonArray);
+        System.out.println(jsonArray.toString());
+        node.send(json.toString());
+    }
+
+    public double[] getEq() {
+        return eq;
     }
 
     @Override
