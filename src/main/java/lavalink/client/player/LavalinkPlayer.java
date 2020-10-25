@@ -191,14 +191,11 @@ public class LavalinkPlayer implements IPlayer {
         return volume;
     }
 
-    public void provideState(JSONObject json) {
-        updateTime = json.getLong("time");
-        position = json.optLong("position", 0);
-    }
-
+    @Override
     public void setEq(double[] eq) {
         JSONArray jsonArray = new JSONArray();
         double[] eqMinMax = new double[15];
+
         for(int i = 0; i < eq.length; i++) {
             double gain = Math.min(1, Math.max(-0.25, eq[i])); // Lavaplayer bounds
 
@@ -219,12 +216,17 @@ public class LavalinkPlayer implements IPlayer {
         json.put("op", "equalizer");
         json.put("guildId", link.getGuildId());
         json.put("bands", jsonArray);
-        System.out.println(jsonArray.toString());
         node.send(json.toString());
     }
 
+    @Override
     public double[] getEq() {
         return eq;
+    }
+
+    public void provideState(JSONObject json) {
+        updateTime = json.getLong("time");
+        position = json.optLong("position", 0);
     }
 
     @Override
