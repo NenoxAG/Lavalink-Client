@@ -87,6 +87,16 @@ public class LavaplayerPlayerWrapper implements IPlayer {
     }
 
     @Override
+    public void setEq(double[] eq) {
+        throw new RuntimeException("This feature only supports Lavalink.");
+    }
+
+    @Override
+    public double[] getEq() {
+        throw new RuntimeException("This feature only supports Lavalink.");
+    }
+
+    @Override
     public void addListener(IPlayerEventListener listener) {
         player.addListener((AudioEventListener) listener);
     }
